@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/redux/4.0.1/redux.js"></script>
+    </head>
+    <body>
+        <style>
+            .container {
+                border: 5px solid black;
+                padding: 1rem;
+                margin-bottom:1rem;
+            }
+            body{
+                margin:1rem;
+            }
+        </style>
+        <div id="red"></div>
+        <div id="blue"></div>
+        <div id="green"></div>
+
+
+        <script>
+            //dispatch 에 전달된 외부 action 을 사용해서 store 에 저장된 state를 변경해주는 역활을 하는 것이 reducer의 역활이다.
+            function reducer(state, action){
+                //dispatch 함수를 통해서 외부에서 주는 action이 reducer에게 전달되는지를 확인
+                console.log(state, action);
+                if(state === undefined){//<== store 객체의 초기값을 reducer를 통해서 처리하고 있다.
+                    return {color: 'yellow'}
+                }
+
+                //복제된 상태를 리턴해준다. 
+                //즉 원본을 변경하지 않고 복제된 상태를 리턴하게 해야 redo / undo 와 같은 redux의 장점을 극대화 할 수있다.
+                //그 이유는 아직 잘 모르겠다. [리덕스 상태 불변성에 대해서 검색해서 알아보자.]
+                var newState;
+
+                if(action.type === 'CHANGE_COLOR'){
+                    newState = Object.assign({}, state, {color:action.color});
+                    state.color = 'red';
+                }
+                return newState;
+            }
+            //redux의 store 를 생성해주는 함수이다. Redux 라이브러리에서 제공해주는 함수
+            var store = Redux.createStore(
+                reducer,
+                window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+            );
+
+            //외부에서 action을 줘서 store의 상태를 변경하려면
+
+
+            console.log(store.getState());
+function red(){
+    var state = store.getState();
+    document.querySelector('#red').innerHTML = `
+    <div class="container" id="component_red" style="background-color:${state.color}">
+        <h1>red</h1>
+        <input type="button" value="fire" onclick="
+            store.dispatch({type:'CHANGE_COLOR', color:'red'});
+
+        ">
+    </div>
+    `;
+}
+
+//redux store의 상태가 변경되면 이를 감지하여 동작을 수행하게 끔 store에 구독을 신청하게
+store.subscribe(red);
+red();
+
+function blue(){
+    var state = store.getState();
+    document.querySelector('#blue').innerHTML = `
+    <div class="container" id="component_blue" style="background-color:${state.color}">
+        <h1>blue</h1>
+        <input type="button" value="fire" onclick="
+            store.dispatch({type:'CHANGE_COLOR', color:'blue'});
+
+        ">
+    </div>
+    `;
+}
+
+//redux store의 상태가 변경되면 이를 감지하여 동작을 수행하게 끔 store에 구독을 신청하게
+store.subscribe(blue);
+blue();
+
+function green(){
+    var state = store.getState();
+    document.querySelector('#green').innerHTML = `
+    <div class="container" id="component_green" style="background-color:${state.color}">
+        <h1>green</h1>
+        <input type="button" value="fire" onclick="
+            store.dispatch({type:'CHANGE_COLOR', color:'green'});
+
+        ">
+    </div>
+    `;
+}
+
+//redux store의 상태가 변경되면 이를 감지하여 동작을 수행하게 끔 store에 구독을 신청하게
+store.subscribe(green);
+green();
+
+        </script>
+        
+    </body>
+</html>
